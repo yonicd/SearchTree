@@ -13,14 +13,25 @@ shinyUI(fluidPage(
       img(src="http://downgraf.com/wp-content/uploads/2014/09/01-progress.gif", height="100",width="100"),
       p("Simulating...")
   ),
-  
-  headerPanel("Tree Search"),
-  
-    sidebarPanel(width=2,
-      radioButtons("m", "Data",split(c('Titanic','StanModels','Stan'),
+  headerPanel("Reactive Tree Search"),
+    sidebarPanel(width=3,
+      a(img(src='http://metrumrg.com/assets/img/logo_bigger.png',align='left',width='100%'),href='http://metrumrg.com',target="_blank"),
+      hr(),
+      radioButtons("m", "Example Data",split(c('Titanic','StanModels','Stan'),
                                      c('1. Titanic',
                                        '2. Applied Regression Modeling: Full Tree',
-                                       '3. Applied Regression Modeling: Sim Output')),selected = 'StanModels')
+                                       '3. Applied Regression Modeling: Sim Output')),selected = 'StanModels'),
+      hr(),
+      checkboxInput(inputId='showtbl',label = 'Show Filter Queries',value = F),
+      hr(),
+      conditionalPanel('input.m=="StanModels"',
+                       actionButton("goButton", "Simulate From GitHub")
+      ),
+      conditionalPanel('input.m=="Stan"', uiOutput('TableView'),
+                       downloadButton('downloadSave', 'Export Stan Output')
+                       # ,
+                       #                    actionButton('shinystan','Launch Shiny Stan')
+                       )
     ),
     
   mainPanel(
@@ -28,20 +39,20 @@ shinyUI(fluidPage(
       tabPanel("Layout Tree Filter",  
                fluidPage(
                   fluidRow(
-                  column(6,uiOutput("Hierarchy")),
-                  column(4,checkboxInput(inputId='showtbl',label = 'Show Filter Queries',value = F))
-                  ),
-                  conditionalPanel('input.showtbl',column(6,verbatimTextOutput("results"))),
-                  conditionalPanel('input.m=="StanModels"',
-                                   column(6,actionButton("goButton", "Simulate Selection From Stan Repo"))
+                  column(6,uiOutput("Hierarchy"))
                   ),
                   column(6,HTML("<div id=\"d3\" class=\"d3plot\"><svg /></div>")),
-                  conditionalPanel('input.m=="StanModels"',column(6,verbatimTextOutput("results2")))
+                  column(6,conditionalPanel('input.showtbl',p('Reactive Filters'),
+                                                            verbatimTextOutput("results")
+                                            ),
+                           conditionalPanel('input.goButton==1',
+                                            p('Simulation Console Output'),
+                                            verbatimTextOutput("results2"))
+                         )
                   )
               ),
       tabPanel("Table",
                fluidPage(
-                          conditionalPanel('input.m=="Stan"',uiOutput('TableView')),
                           column(12,DT::dataTableOutput('table'))
                         )
                )
