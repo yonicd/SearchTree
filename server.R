@@ -22,9 +22,7 @@ shinyServer(function(input, output, session) {
     if(input$goButton==0){
       out=read.stan(stan.sim.output,TreeStruct())
     }else{
-      out.list=RunStan()[['out']]
-      out=list(stan.df.extract(out.list))
-      names(out)=names(out.list)
+      out=read.stan(RunStan()[['out']],structure.list[['Stan']])
     }
     return(out)
   })

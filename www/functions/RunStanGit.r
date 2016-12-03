@@ -1,4 +1,4 @@
-RunStanGit=function(url.loc,dat.loc.in,r.file,flag=T){
+RunStanGit=function(url.loc,dat.loc.in,r.file,flag=T,...){
 
 # Internal Functions ----  
   unpack.list <- function(object) {
@@ -13,6 +13,7 @@ RunStanGit=function(url.loc,dat.loc.in,r.file,flag=T){
   }
   
   setwd.url=function(y){
+
     x=c(as.numeric(gregexpr('\\"',y)[[1]]),as.numeric(gregexpr("\\'",y)[[1]]))
     x=x[x!=-1]
     
@@ -32,7 +33,7 @@ RunStanGit=function(url.loc,dat.loc.in,r.file,flag=T){
   r.code=readLines(code.loc)
 
 #Rewrite paths for source and read commands to url path ----
-  for(i in which(grepl('read|source',r.code))) r.code[i]=setwd.url(r.code[i])
+  for(i in which(grepl('read|source|scan',r.code))) r.code[i]=setwd.url(r.code[i])
   stan.find=which(grepl('stan\\(',r.code))
   to.unlink=rep(NA,length(stan.find))
   
@@ -63,6 +64,7 @@ RunStanGit=function(url.loc,dat.loc.in,r.file,flag=T){
       }
   }
 
+  
 #Evaluate new code ----
   eval(parse(text=r.code))
   
